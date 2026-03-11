@@ -112,13 +112,28 @@ const categoryBadgeColor = (category: string): string => {
 </template>
 
 <style scoped>
-/* 隐藏滚动条但保持滚动功能 */
+/* 自定义水平滚动条样式 */
 .overflow-x-auto {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #c7d2fe transparent;
 }
 
 .overflow-x-auto::-webkit-scrollbar {
-  display: none;
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
 }
 </style>

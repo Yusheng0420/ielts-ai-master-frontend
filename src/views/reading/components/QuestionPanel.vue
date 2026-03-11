@@ -39,7 +39,7 @@
             <span v-if="showResults && opt.charAt(0) === q.answer" class="ml-2">✓</span>
           </BaseButton>
         </div>
-        <div v-if="showResults && q.explanation" class="mt-2 p-2 bg-slate-50 rounded text-sm text-slate-600">
+        <div v-if="showResults && q.explanation" class="mt-2 p-2 bg-slate-50 rounded-lg text-sm text-slate-600">
           {{ q.explanation }}
         </div>
       </div>
