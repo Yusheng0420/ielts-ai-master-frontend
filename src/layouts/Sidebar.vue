@@ -18,7 +18,7 @@ const menuItems = [
 
 const visibleMenuItems = computed(() => {
   const items = [...menuItems]
-  if (userStore.isAdmin) {
+  if (userStore.user?.username === 'admin') {
     items.push({ name: 'Admin', path: '/admin/upload', icon: 'heroicons:shield-check' })
   }
   return items

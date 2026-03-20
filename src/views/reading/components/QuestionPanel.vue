@@ -9,38 +9,50 @@
       </div>
     </template>
     <div class="space-y-4">
-      <div v-for="(q, idx) in questions" :key="q.id" class="pb-4 border-b border-border/70 last:border-0">
-        <p class="font-medium text-text-primary mb-3">
-          <span class="text-primary">{{ idx + 1 }}.</span> {{ q.questionText }}
+      <div v-for="(q, idx) in questions" :key="q.id" class="pb-4 border-b border-slate-100 last:border-0">
+        <p class="font-medium text-slate-800 mb-3">
+          <span class="text-indigo-600">{{ idx + 1 }}.</span> {{ q.stem }}
         </p>
         <div class="space-y-2">
           <BaseButton
-            v-if="q.type === 'TRUE_FALSE_NOT_GIVEN'"
-            v-for="opt in ['TRUE', 'FALSE', 'NOT GIVEN']"
-            :key="`${q.id}-tfn-${opt}`"
-            :variant="getButtonVariant(q.id, opt, q.answer, true)"
+            v-if="q.questionTypeCode === 'judgment'"
+            v-for="opt in ['TRUE', 'FALSE']"
+            :key="`${q.id}-judgment-${opt}`"
+            :variant="getButtonVariant(q.id, opt, q.correctAnswer)"
             block
             :disabled="showResults"
             @click="selectAnswer(q.id, opt)"
           >
             {{ opt }}
-            <span v-if="showResults && opt === q.answer" class="ml-2">✓</span>
+            <span v-if="showResults && opt === q.correctAnswer" class="ml-2">✓</span>
+          </BaseButton>
+          <BaseButton
+            v-else-if="q.questionTypeCode === 'match'"
+            v-for="opt in parseMatchOptions(q.options)"
+            :key="`${q.id}-match-${opt.label}`"
+            :variant="getButtonVariant(q.id, opt.label, q.correctAnswer)"
+            block
+            :disabled="showResults"
+            @click="selectAnswer(q.id, opt.label)"
+          >
+            {{ opt.label }}. {{ opt.content }}
+            <span v-if="showResults && opt.label === q.correctAnswer" class="ml-2">✓</span>
           </BaseButton>
           <BaseButton
             v-else
             v-for="opt in q.options"
-            :key="`${q.id}-mc-${opt}`"
-            :variant="getButtonVariant(q.id, opt, q.answer, false)"
+            :key="`${q.id}-mc-${opt.label}`"
+            :variant="getButtonVariant(q.id, opt.label, q.correctAnswer)"
             block
             :disabled="showResults"
-            @click="selectAnswer(q.id, opt.charAt(0))"
+            @click="selectAnswer(q.id, opt.label)"
           >
-            {{ opt }}
-            <span v-if="showResults && opt.charAt(0) === q.answer" class="ml-2">✓</span>
+            {{ opt.label }}. {{ opt.content }}
+            <span v-if="showResults && opt.label === q.correctAnswer" class="ml-2">✓</span>
           </BaseButton>
         </div>
-        <div v-if="showResults && q.explanation" class="mt-2 p-2 bg-surface-muted rounded-lg text-sm text-text-secondary">
-          {{ q.explanation }}
+        <div v-if="showResults && q.analysis" class="mt-2 p-2 bg-slate-50 rounded-lg text-sm text-slate-600">
+          {{ q.analysis }}
         </div>
       </div>
     </div>
@@ -74,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { Question } from '../../../types/article'
+import type { Question, QuestionOption } from '../../../types/article'
 import { BaseCard, BaseButton } from '@/components'
 
 const props = defineProps<{
@@ -89,6 +101,10 @@ const emit = defineEmits<{
 }>()
 
 const selectedAnswers = ref<Record<number, string>>({})
+
+function parseMatchOptions(options?: QuestionOption[]): QuestionOption[] {
+  return options || []
+}
 
 function selectAnswer(questionId: number, answer: string) {
   selectedAnswers.value[questionId] = answer
@@ -110,7 +126,7 @@ const score = computed(() => {
   if (!props.showResults) return 0
   let correct = 0
   props.questions.forEach(q => {
-    if (selectedAnswers.value[q.id] === q.answer) {
+    if (selectedAnswers.value[q.id] === q.correctAnswer) {
       correct++
     }
   })
@@ -129,16 +145,15 @@ const scoreBgClass = computed(() => {
   return 'bg-danger/10'
 })
 
-function getButtonVariant(questionId: number, option: string, correctAnswer?: string, isTrueFalse: boolean = true): ButtonVariant {
+function getButtonVariant(questionId: number, option: string, correctAnswer?: string): ButtonVariant {
   const userAnswer = selectedAnswers.value[questionId]
-  const optionKey = isTrueFalse ? option : option.charAt(0)
   
   if (props.showResults) {
-    if (optionKey === correctAnswer) return 'success'
-    if (optionKey === userAnswer && optionKey !== correctAnswer) return 'danger'
+    if (option === correctAnswer) return 'success'
+    if (option === userAnswer && option !== correctAnswer) return 'danger'
     return 'secondary'
   }
   
-  return optionKey === userAnswer ? 'tertiary' : 'secondary'
+  return option === userAnswer ? 'tertiary' : 'secondary'
 }
 </script>

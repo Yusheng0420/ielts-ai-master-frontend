@@ -52,7 +52,7 @@
           class="block p-3 rounded-lg hover:bg-surface-muted transition-colors border border-border/70"
         >
           <p class="font-medium text-text-primary">{{ article.title }}</p>
-          <p class="text-xs text-text-secondary mt-1">{{ article.category }}</p>
+          <p class="text-xs text-text-secondary mt-1">{{ article.examType }}</p>
         </router-link>
       </div>
     </BaseCard>
@@ -66,19 +66,20 @@ import { getArticleDetail } from '@/api/article'
 import { apiGetUserStats } from '@/api/stats'
 import { BaseCard } from '@/components'
 import type { Article } from '@/types/article'
+import type { UserStats } from '@/types/user'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const recentArticlesData = ref<Article[]>([])
-const stats = ref({
-  totalArticles: 0,
-  totalVocabulary: 0,
-  streakDays: 0
+const stats = ref<UserStats>({
+  totalArticlesRead: 0,
+  totalQuestionsAnswered: 0,
+  correctRate: 0
 })
 
-const totalArticles = computed(() => stats.value.totalArticles)
-const totalVocab = computed(() => stats.value.totalVocabulary)
-const streakDays = computed(() => stats.value.streakDays)
+const totalArticles = computed(() => stats.value.totalArticlesRead)
+const totalVocab = computed(() => stats.value.totalQuestionsAnswered)
+const streakDays = computed(() => stats.value.correctRate)
 
 const recentArticles = computed(() => {
   return recentArticlesData.value.slice(0, 5)

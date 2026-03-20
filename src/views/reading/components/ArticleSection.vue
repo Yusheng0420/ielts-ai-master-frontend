@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { Paragraph } from '@/types/article'
+
 const props = defineProps<{
   title: string
-  content: string
+  paragraphs: Paragraph[]
 }>()
 
 const emit = defineEmits<{
@@ -27,7 +29,10 @@ const handleMouseUp = () => {
       class="flex-1 pr-4 leading-relaxed text-text-secondary text-base"
       @mouseup="handleMouseUp"
     >
-      {{ content }}
+      <div v-for="paragraph in paragraphs" :key="paragraph.paragraphNumber" class="paragraph-block">
+        <p class="text-slate-800">{{ paragraph.content }}</p>
+        <p v-if="paragraph.translation" class="text-slate-500 text-sm mt-1">{{ paragraph.translation }}</p>
+      </div>
     </div>
   </div>
 </template>
